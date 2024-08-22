@@ -1,0 +1,3 @@
+Authentication
+Modification:
+.when the user is logged out, getme and getfriends throws a 401 status(find a way to make this better) 
