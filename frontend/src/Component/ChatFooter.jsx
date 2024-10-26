@@ -14,8 +14,7 @@ import { MdOutlineStopCircle } from "react-icons/md";
 import AudioPlayer from "./messages/AudioPlayer";
 import { GiCancel } from "react-icons/gi";
 
-
-const iconsSize="h-6 w-6"
+const iconsSize = "h-6 w-6";
 
 function reducer(state, action) {
   switch (action.type) {
@@ -93,6 +92,21 @@ function ChatFooter() {
     minutes: 0,
     isRunning: false,
   });
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      console.log("Selected file:", file);
+      // You can read the file content here if needed
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        console.log("File content:", e.target.result);
+      };
+      reader.readAsText(file); // or use reader.readAsDataURL(file) for images, etc.
+    }
+  };
 
   useEffect(() => {
     setshowEmojis(state.isEmoji);
@@ -261,13 +275,21 @@ function ChatFooter() {
               <LuSendHorizonal className="h-full w-full" />
             </div>
             <div className="absolute  w-[100px] bottom-full right-3  mb-2 hidden group-hover:block bg-gray-700 text-white text-xs shadow-xl border rounded-2xl py-1 px-2">
-              Press Shift + Enter to go to the next line Or click Enter to send a message
+              Press Shift + Enter to go to the next line Or click Enter to send
+              a message
             </div>
           </button>
+          {selectedFile && <p>{selectedFile.name}</p>}
           <button>
-            <div className={`${iconsSize}`}>
+            <label className={`${iconsSize} cursor-pointer`}>
+              <input
+                type="file"
+                className="hidden"
+                onChange={handleFileChange}
+              />
               <IoMdAttach className="h-full w-full" />
-            </div>
+            </label>
+            
           </button>
           <button>
             <div

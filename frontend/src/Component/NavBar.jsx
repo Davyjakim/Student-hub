@@ -8,7 +8,7 @@ import { LuMenu } from "react-icons/lu";
 import { chatContext } from "./Body";
 function NavBar() {
   const { userdetails, logout } = useContext(AuthContext);
-  const { setMessageList } = useContext(chatContext);
+  const { setMessageList,setFriends } = useContext(chatContext);
   const [isMenu, setIsMenu] = useState(false);
 
   return (
@@ -38,6 +38,7 @@ function NavBar() {
             className="flex items-center border-l rounded-md pl-2"
             onClick={() => {
               setMessageList([]);
+              setFriends([])
               logout();
             }}
           >

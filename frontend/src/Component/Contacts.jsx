@@ -3,6 +3,8 @@ import { LiaSearchSolid } from "react-icons/lia";
 import { IoPersonCircleOutline } from "react-icons/io5";
 import { AuthContext } from "..";
 import { chatContext } from "./Body";
+import { CiCirclePlus } from "react-icons/ci";
+import AddFriendFrame from "./AddFriendFrame";
 function Contacts() {
   // const { friends } = useContext(AuthContext);
   const {
@@ -14,32 +16,40 @@ function Contacts() {
     contactShape,
     friends,
     setContact,
+    setIsOpen,
     setMessageList,
   } = useContext(chatContext);
-
+  const { userdetails } = useContext(AuthContext);
   const [currentSearch, setCurrentSearch] = useState("");
-
+  const [isAddFriend,SetisAddFriend]= useState(false);
   //  socket.on("message_in_room",joinRoom)
 
   useEffect(() => {
     socket.emit("requestChatList", Room);
 
     socket.on("chatList", (messages) => {
-      console.log(messages);
       setMessageList(messages);
     });
     return () => {
       socket.off("chatList");
     };
-  }, [Contact]);
+  }, [Contact, Room, socket, setMessageList]);
+
+  // console.log(friends[1]?.unreadMessages[friends[1]?.unreadMessages.length-1].SentBy)
+
+  //unreadMessages[friends.friend.unreadMessages.length - 1].SentBy !== userdetails._id
 
   return (
     <div
       id="Contact_container"
-      className={`bg-gray-500 lg:text-lg md:text-base sm:text-sm p-2 rounded-l-md ${contactShape}`}
+      className={`bg-gray-500 relative lg:text-lg md:text-base sm:text-sm p-2 rounded-l-md ${contactShape}`}
     >
+     {
+      isAddFriend&&<div><AddFriendFrame SetisAddFriend={SetisAddFriend}/></div>
+     }
       {/* Search */}
-      <div className="flex relative items-center mb-3 gap-1 rounded-sm border-b p-1  shadow-lg bg-[#EAECF5] w-full">
+     <div className="flex relative ">
+     <div className="flex relative items-center mb-3 gap-1 rounded-sm border-b p-1  shadow-lg bg-[#EAECF5] w-full">
         <div className="min-h-5 min-w-5">
           <LiaSearchSolid className="w-full h-full" />
         </div>
@@ -52,7 +62,7 @@ function Contacts() {
             setCurrentSearch(e.target.value);
           }}
         />
-        <div className=" absolute bg-white rounded-lg  w-full top-full mt-1  left-0">
+        <div className=" absolute bg-white z-10 rounded-lg  w-full top-full mt-1  left-0">
           {/* <div
             className="bg-white h-3 w-full "
           
@@ -82,6 +92,13 @@ function Contacts() {
             )}
         </div>
       </div>
+      <div onClick={()=>{
+        SetisAddFriend(true)
+      }} className="flex h-max mt-1 rounded-md " >
+       
+        <CiCirclePlus className="h-7 w-7" />
+      </div>
+     </div>
 
       {/* Contacts */}
 
@@ -98,17 +115,21 @@ function Contacts() {
             <div
               key={el.friend.id}
               onClick={() => {
+                if (Room) {
+                  socket.emit("leavePreviousRoom", Room);
+                }
                 setRoom(el.friend.ChatRoom);
                 if (el.friend.friendName !== Contact.name) {
                   setContact({ name: el.friend.friendName, id: el.friend.id });
                 }
+                setIsOpen(true);
               }}
-              className="flex gap-2 rounded-[4px] hover:bg-opacity-50 hover:bg-slate-100 w-full"
+              className="flex gap-2 relative rounded-[4px] hover:bg-opacity-50 hover:bg-slate-100 w-full"
             >
-              <div className="h-10 w-10">
+              <div className="min-h-10 min-w-10">
                 <IoPersonCircleOutline className="h-full w-full" />
               </div>
-              <div className="w-full flex flex-col gap-2">
+              <div className="w-full flex flex-col gap-0">
                 <div className="flex justify-between pr-1 ">
                   <div className="font-semibold sm:text-sm">
                     {el.friend.friendName}
@@ -121,7 +142,7 @@ function Contacts() {
                       : ""}
                   </div>
                 </div>
-                <div className="text-xs ">
+                <div className="text-xs flex justify-between ">
                   <div className="text-xs">
                     {el.chatList &&
                       el.chatList.length > 0 &&
@@ -137,6 +158,19 @@ function Contacts() {
                         : "Audio")}
                   </div>
                 </div>
+                {friends &&
+                  userdetails &&
+                  el.unreadMessages &&
+                  el.unreadMessages.length > 0 && (
+                    <div className="absolute right-0 top-4">
+                      {el.unreadMessages[el.unreadMessages.length - 1]
+                        ?.SentBy !== userdetails._id && (
+                        <div className="bg-red-500 font-bold text-white rounded-full sm:text-[10px] md:text-sm shadow-lg w-4 h-4 flex items-center justify-center">
+                          {el.unreadMessages.length}
+                        </div>
+                      )}
+                    </div>
+                  )}
               </div>
             </div>
           ))}

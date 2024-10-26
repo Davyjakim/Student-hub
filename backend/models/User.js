@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
 const config = require("config");
-const { Messages } = require("./message");
 const jwt = require("jsonwebtoken");
 
 // define the shape of the User in the database
@@ -25,6 +24,7 @@ const UserSchema = new mongoose.Schema({
     require: true,
     minlength: 5,
   },
+  
   isAdmin: { type: Boolean, default: false },
   profilePicture: { data: Buffer, contentType: String },
   friends: [

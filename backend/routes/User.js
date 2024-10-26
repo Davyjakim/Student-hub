@@ -100,12 +100,13 @@ router.get("/getFriends", auth, async (req, res) => {
     // Use `map` to create an array of promises
     const promises = friends.map(async (fr) => {
       const messages = await Messages.findOne({ chatRoom: fr.ChatRoom });
-      return { friend: fr, chatList: messages.messagelist };
+      const unreadMessage= messages.messagelist.filter(Urm=> Urm.isRead===false)
+      return { friend: fr, chatList: messages.messagelist, unreadMessages:unreadMessage };
     });
     
     // Wait for all promises to resolve
     const resolvedResults = await Promise.all(promises);
-    
+  
     // Send the resolved results in the response
     res.status(200).send(resolvedResults);
   } catch (error) {

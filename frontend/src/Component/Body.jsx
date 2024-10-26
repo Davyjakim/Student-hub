@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useContext,
 } from "react";
+
 import ChatBoxHeader from "./ChatBoxHeader";
 import ChatBody from "./ChatBody";
 import ChatFooter from "./ChatFooter";
@@ -18,8 +19,9 @@ import EmojiPicker from "emoji-picker-react";
 
 export const chatContext = createContext();
 
-const contactShape= " sm:h-[440px] lg:h-[590px]  md:h-[540px]"
-const ChatBodyShape="sm:h-[350px] lg:h-[500px]  md:h-[450px] h-full p-2 w-full"
+const contactShape = " sm:h-[448px] lg:h-[598px]  md:h-[548px]";
+const ChatBodyShape =
+  "sm:h-[350px] lg:h-[500px]  md:h-[450px] h-full p-2 w-full";
 
 function Body() {
   const [currentMessage, setCurrentMessage] = useState("");
@@ -30,7 +32,10 @@ function Body() {
   const [friends, setFriends] = useState([]);
   const [audioURL, setAudioURL] = useState("");
   const [duration, setDuration] = useState(0);
+  const [notification, setnotification] = useState([]);
   const [showEmojis, setshowEmojis] = useState(false);
+  const [isOpen, setIsOpen]= useState(false)
+
   useEffect(() => {
     const fetchfreinds = async () => {
       try {
@@ -39,7 +44,8 @@ function Body() {
       } catch (error) {}
     };
     fetchfreinds();
-  }, [MessageList]);
+  }, []);
+
   const socket = useMemo(
     () =>
       io.connect("http://localhost:4000", {
@@ -57,12 +63,13 @@ function Body() {
         SentBy: userdetails._id,
         ReceivedBy: Contact.id,
         content: currentMessage,
+        isRead: false,
         isAudio: false,
         timestamp: new Date(),
       };
       await socket.emit("send_message", messageData);
       setMessageList((list) => [...list, messageData]);
-      setCurrentMessage(""); // Clear the message after sending
+      setCurrentMessage("");
       console.log("handleOnSendMessage just called");
     }
     if (Room !== "" && audioURL !== "") {
@@ -72,6 +79,7 @@ function Body() {
         ReceivedBy: Contact.id,
         content: audioURL,
         isAudio: true,
+        isRead: false,
         duration: duration,
         timestamp: new Date(),
       };
@@ -118,7 +126,9 @@ function Body() {
       audioURL,
       duration,
       showEmojis,
-      contactShape,ChatBodyShape,
+      contactShape,
+      ChatBodyShape,
+      notification,isOpen,setIsOpen,setFriends,
       setshowEmojis,
       setDuration,
       setAudioURL,
@@ -133,18 +143,40 @@ function Body() {
   );
 
   useEffect(() => {
+    
     socket.emit("join_room", Room);
+    socket.on("NewChatlist", (data)=>{
+      setMessageList(data)
+    })
   }, [Room]);
   useEffect(() => {
     const receiveMessage = (data) => {
-      setMessageList((list) => [...list, data]);
+      console.log(data);
+      if(data.Room === Room){
+        setMessageList((list) => [...list, data]);
+      }
+      
     };
 
     socket.on("receive_message", receiveMessage);
     return () => {
       socket.off("receive_message", receiveMessage);
     };
-  }, []);
+  }, [MessageList]);
+
+  useEffect(() => {
+    socket.on("Friends", (data) => {
+      setFriends(data)
+      console.log(data)
+    });
+
+    return () => {
+      socket.off("Friends", (data) => {
+        setFriends(data);
+      });
+    };
+  }, [MessageList]);
+
 
   return (
     <chatContext.Provider value={contextValue}>
@@ -154,15 +186,15 @@ function Body() {
         </div>
         <div className=" flex-grow flex ">
           <div className="relative w-full h-max  grid-rows-1 grid grid-cols-12 ">
-            <div className=" col-span-4">
+            <div className={` md:col-span-4 md:block sm:${isOpen?"hidden":" block col-span-12 "} `}>
               <Contacts />
             </div>
             {Room === "" ? (
               <DefaultChatBody />
             ) : (
-              <div className=" h-full col-span-8 flex flex-col rounded-r-md">
+              <div className={` h-full md:block md:col-span-8 flex sm:${!isOpen?"hidden":" block col-span-12 "} flex-col rounded-r-md `}>
                 <div className="">
-                  <ChatBoxHeader />
+                  <ChatBoxHeader  />
                 </div>
                 <div className="  h-max ">
                   <ChatBody />
@@ -170,20 +202,20 @@ function Body() {
                 <div className=" h-full w-full bottom-0 ">
                   <ChatFooter />
                 </div>
-                {showEmojis&&<div className=" absolute bottom-12 right-1 h-max w-max">
-                  <div
-                    className="bg-slate-300 w-full h-full transform origin-bottom-right scale-50 sm:scale-50 md:scale-90 lg:scale-100 z-10"
-                  >
-                    <EmojiPicker
-                      width={300}
-                      height={400}
-                      size={20}
-                      onEmojiClick={(e, em) => {
-                        setCurrentMessage((p) => p + e.emoji);
-                      }}
-                    />
+                {showEmojis && (
+                  <div className=" absolute bottom-12 right-1 h-max w-max">
+                    <div className="bg-slate-300 w-full h-full transform origin-bottom-right scale-50 sm:scale-50 md:scale-90 lg:scale-100 z-10">
+                      <EmojiPicker
+                        width={300}
+                        height={400}
+                        size={20}
+                        onEmojiClick={(e, em) => {
+                          setCurrentMessage((p) => p + e.emoji);
+                        }}
+                      />
+                    </div>
                   </div>
-                </div>}
+                )}
               </div>
             )}
           </div>
