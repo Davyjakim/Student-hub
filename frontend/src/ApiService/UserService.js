@@ -42,6 +42,28 @@ class UserService {
     }
     return { friends, freindsfetchError };
   }
+  async AvailableFriends(){
+    let users = [];
+    let usersfetchError = "";
+    try {
+      const res = await serverurl.get("users/getUsers");
+      users = res.data;
+    } catch (error) {
+      usersfetchError = error.message;
+    }
+    return { users, usersfetchError };
+  }
+  async AddFriend(name){
+  
+    try {
+      const res = await serverurl.put(`users/addFriend/${name}`)
+    
+      return res
+    } catch (error) {
+    
+      return error
+    }
+  }
 }
 
 export default new UserService();

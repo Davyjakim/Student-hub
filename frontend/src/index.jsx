@@ -15,14 +15,14 @@ import SignInPage from "./Component/SignInPage.jsx";
 import UserService from "./ApiService/UserService.js";
 import Cookie from "js-cookie";
 import SignUpPage from "./Component/SignUpPage.jsx";
-import EventForm from "./Component/Orline.jsx";
+import Not_foundPage from "./Component/Not_foundPage.jsx";
 export const AuthContext = createContext();
 
 const ProtectedLayout = () => {
   const { authtoken } = React.useContext(AuthContext);
   if (!authtoken) {
     // Redirect to the login page if the user is not authenticated
-    window.location.href = "http://localhost:3000/login";
+    window.location.href = `${window.location.origin}/login`;
     return <div>...loading</div>;
   }
   return <Outlet />;
@@ -36,8 +36,8 @@ const router = createBrowserRouter([
     path: "/signup",
     element: <SignUpPage />,
   },{
-    path:"/orline",
-    element:<EventForm/>
+    path:"*",
+    element:<Not_foundPage/>
   },
   {
     path: "/",
@@ -79,7 +79,7 @@ const AppWithRouter = () => {
   }, [authtoken]);
 
   const logout = () => {
-    window.location.href = "http://localhost:3000/login";
+    window.location.href = `${window.location.origin}/login`;
     Cookie.remove("token");
     setUser({});
   };
@@ -99,7 +99,7 @@ const AppWithRouter = () => {
   );
 
   return (
-    <React.StrictMode>
+  
       <AuthContext.Provider value={contextValue}>
         <Suspense
           fallback={
@@ -111,7 +111,7 @@ const AppWithRouter = () => {
           <RouterProvider router={router} />
         </Suspense>
       </AuthContext.Provider>
-    </React.StrictMode>
+    
   );
 };
 
@@ -122,7 +122,4 @@ if (container) {
   root.render(<AppWithRouter />);
 }
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+

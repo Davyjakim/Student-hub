@@ -7,3 +7,9 @@
     font-family: Poppins, sans-serif !important; 
   }
 
+  .outline-404 {
+    --tw-text-opacity: 0.2; /* Makes the fill transparent */
+    -webkit-text-stroke: 1px #ffffff; /* Adjust stroke color and width */
+    text-shadow: none;
+  }
+  

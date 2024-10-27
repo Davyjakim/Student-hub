@@ -32,9 +32,9 @@ function Body() {
   const [friends, setFriends] = useState([]);
   const [audioURL, setAudioURL] = useState("");
   const [duration, setDuration] = useState(0);
-  const [notification, setnotification] = useState([]);
+  const [TotalUnread, setTotalUnread] = useState(0);
   const [showEmojis, setshowEmojis] = useState(false);
-  const [isOpen, setIsOpen]= useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const fetchfreinds = async () => {
@@ -128,7 +128,9 @@ function Body() {
       showEmojis,
       contactShape,
       ChatBodyShape,
-      notification,isOpen,setIsOpen,setFriends,
+      isOpen,TotalUnread, setTotalUnread,
+      setIsOpen,
+      setFriends,
       setshowEmojis,
       setDuration,
       setAudioURL,
@@ -139,23 +141,21 @@ function Body() {
       setRoom,
       handleOnSendMessage,
     }),
-    [currentMessage, Contact, friends, MessageList, audioURL, duration, Room]
+    [currentMessage, Contact,TotalUnread, friends, MessageList, audioURL, duration, Room]
   );
 
   useEffect(() => {
-    
     socket.emit("join_room", Room);
-    socket.on("NewChatlist", (data)=>{
-      setMessageList(data)
-    })
+    socket.on("NewChatlist", (data) => {
+      setMessageList(data);
+    });
   }, [Room]);
   useEffect(() => {
     const receiveMessage = (data) => {
       console.log(data);
-      if(data.Room === Room){
+      if (data.Room === Room) {
         setMessageList((list) => [...list, data]);
       }
-      
     };
 
     socket.on("receive_message", receiveMessage);
@@ -166,8 +166,8 @@ function Body() {
 
   useEffect(() => {
     socket.on("Friends", (data) => {
-      setFriends(data)
-      console.log(data)
+      setFriends(data);
+      console.log(data);
     });
 
     return () => {
@@ -177,7 +177,6 @@ function Body() {
     };
   }, [MessageList]);
 
-
   return (
     <chatContext.Provider value={contextValue}>
       <div className=" h-screen max-h-screen  overflow-y-scroll flex flex-col max-w-screen p-1">
@@ -186,15 +185,23 @@ function Body() {
         </div>
         <div className=" flex-grow flex ">
           <div className="relative w-full h-max  grid-rows-1 grid grid-cols-12 ">
-            <div className={` md:col-span-4 md:block sm:${isOpen?"hidden":" block col-span-12 "} `}>
+            <div
+              className={` md:col-span-4 md:block sm:${
+                isOpen ? "hidden" : " block col-span-12 "
+              } `}
+            >
               <Contacts />
             </div>
             {Room === "" ? (
               <DefaultChatBody />
             ) : (
-              <div className={` h-full md:block md:col-span-8 flex sm:${!isOpen?"hidden":" block col-span-12 "} flex-col rounded-r-md `}>
+              <div
+                className={` h-full md:block md:col-span-8 flex sm:${
+                  !isOpen ? "hidden" : " block col-span-12 "
+                } flex-col rounded-r-md `}
+              >
                 <div className="">
-                  <ChatBoxHeader  />
+                  <ChatBoxHeader />
                 </div>
                 <div className="  h-max ">
                   <ChatBody />

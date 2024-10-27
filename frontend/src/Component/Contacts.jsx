@@ -17,13 +17,13 @@ function Contacts() {
     friends,
     setContact,
     setIsOpen,
-    setMessageList,
+    setMessageList,TotalUnread, setTotalUnread
   } = useContext(chatContext);
   const { userdetails } = useContext(AuthContext);
   const [currentSearch, setCurrentSearch] = useState("");
-  const [isAddFriend,SetisAddFriend]= useState(false);
+  const [isAddFriend, SetisAddFriend] = useState(false);
   //  socket.on("message_in_room",joinRoom)
-
+ 
   useEffect(() => {
     socket.emit("requestChatList", Room);
 
@@ -35,70 +35,84 @@ function Contacts() {
     };
   }, [Contact, Room, socket, setMessageList]);
 
-  // console.log(friends[1]?.unreadMessages[friends[1]?.unreadMessages.length-1].SentBy)
 
-  //unreadMessages[friends.friend.unreadMessages.length - 1].SentBy !== userdetails._id
+  useEffect(() => {
+    const totalUnreadCount = friends.reduce((acc, friend) => {
+      const unreadMessages = friend.unreadMessages.filter(
+        (msg) => msg.SentBy !== userdetails._id
+      );
+      return acc + unreadMessages.length;
+    }, 0);
+
+    setTotalUnread(totalUnreadCount);
+  }, [friends, userdetails._id]);
+
+  console.log(TotalUnread);
 
   return (
     <div
       id="Contact_container"
       className={`bg-gray-500 relative lg:text-lg md:text-base sm:text-sm p-2 rounded-l-md ${contactShape}`}
     >
-     {
-      isAddFriend&&<div><AddFriendFrame SetisAddFriend={SetisAddFriend}/></div>
-     }
-      {/* Search */}
-     <div className="flex relative ">
-     <div className="flex relative items-center mb-3 gap-1 rounded-sm border-b p-1  shadow-lg bg-[#EAECF5] w-full">
-        <div className="min-h-5 min-w-5">
-          <LiaSearchSolid className="w-full h-full" />
+      {isAddFriend && (
+        <div>
+          <AddFriendFrame SetisAddFriend={SetisAddFriend} />
         </div>
-        <input
-          type="text"
-          className=" placeholder:text-sm bg-transparent focus:outline-none focus:ring-0"
-          placeholder="search by name"
-          value={currentSearch}
-          onChange={(e) => {
-            setCurrentSearch(e.target.value);
-          }}
-        />
-        <div className=" absolute bg-white z-10 rounded-lg  w-full top-full mt-1  left-0">
-          {/* <div
+      )}
+      {/* Search */}
+      <div className="flex relative ">
+        <div className="flex relative items-center mb-3 gap-1 rounded-sm border-b p-1  shadow-lg bg-[#EAECF5] w-full">
+          <div className="min-h-5 min-w-5">
+            <LiaSearchSolid className="w-full h-full" />
+          </div>
+          <input
+            type="text"
+            className=" placeholder:text-sm bg-transparent focus:outline-none focus:ring-0"
+            placeholder="search by name"
+            value={currentSearch}
+            onChange={(e) => {
+              setCurrentSearch(e.target.value);
+            }}
+          />
+          <div className=" absolute bg-white z-10 rounded-lg  w-full top-full mt-1  left-0">
+            {/* <div
             className="bg-white h-3 w-full "
           
           ></div> */}
-          {/* <div className="absolute bottom-0 right-0 transform translate-y-1/2 w-0 h-0 border-t-[8px] border-t-transparent border-r-[6px] border-r-[#7F56D9] border-b-[7px] border-b-transparent"></div> */}
-          {friends
-            .filter(
-              (fr) =>
-                currentSearch &&
-                fr.friend.friendName
-                  .toLowerCase()
-                  .includes(currentSearch.toLowerCase())
-            )
-            .map(
-              (fr, i) =>
-                currentSearch !== fr.friend.friendName && (
-                  <div
-                    className={` hover:bg-slate-400 px-3 rounded-md py-0.5 m-1 `}
-                    onClick={() => {
-                      setCurrentSearch(fr.friend.friendName);
-                    }}
-                    key={i}
-                  >
-                    {fr.friend.friendName}
-                  </div>
-                )
-            )}
+            {/* <div className="absolute bottom-0 right-0 transform translate-y-1/2 w-0 h-0 border-t-[8px] border-t-transparent border-r-[6px] border-r-[#7F56D9] border-b-[7px] border-b-transparent"></div> */}
+            {friends
+              .filter(
+                (fr) =>
+                  currentSearch &&
+                  fr.friend.friendName
+                    .toLowerCase()
+                    .includes(currentSearch.toLowerCase())
+              )
+              .map(
+                (fr, i) =>
+                  currentSearch !== fr.friend.friendName && (
+                    <div
+                      className={` hover:bg-slate-400 px-3 rounded-md py-0.5 m-1 `}
+                      onClick={() => {
+                        setCurrentSearch(fr.friend.friendName);
+                      }}
+                      key={i}
+                    >
+                      {fr.friend.friendName}
+                    </div>
+                  )
+              )}
+          </div>
+        </div>
+        <div
+          onClick={() => {
+            SetisAddFriend(true);
+          }}
+          className="flex h-max mt-1 rounded-md "
+        >
+          <CiCirclePlus className="h-7 w-7" />
         </div>
       </div>
-      <div onClick={()=>{
-        SetisAddFriend(true)
-      }} className="flex h-max mt-1 rounded-md " >
-       
-        <CiCirclePlus className="h-7 w-7" />
-      </div>
-     </div>
 
       {/* Contacts */}
 
@@ -135,6 +149,7 @@ function Contacts() {
                     {el.friend.friendName}
                   </div>
                   <div className="text-xs md:text-[12px] sm:text-[8px]">
+                    {/* last sent time */}
                     {el.chatList && el.chatList.length > 0
                       ? `${formatDate(
                           el.chatList[el.chatList.length - 1].timestamp
@@ -144,6 +159,7 @@ function Contacts() {
                 </div>
                 <div className="text-xs flex justify-between ">
                   <div className="text-xs">
+                    {/* last message sent */}
                     {el.chatList &&
                       el.chatList.length > 0 &&
                       (!el.chatList[el.chatList.length - 1].isAudio

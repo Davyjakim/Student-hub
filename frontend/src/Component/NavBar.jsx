@@ -8,7 +8,7 @@ import { LuMenu } from "react-icons/lu";
 import { chatContext } from "./Body";
 function NavBar() {
   const { userdetails, logout } = useContext(AuthContext);
-  const { setMessageList,setFriends } = useContext(chatContext);
+  const { setMessageList,setFriends,TotalUnread } = useContext(chatContext);
   const [isMenu, setIsMenu] = useState(false);
 
   return (
@@ -25,10 +25,13 @@ function NavBar() {
           </NavLink>
           <NavLink
             to="/"
-            className="flex active:text-blue-400 items-center gap-2"
+            className="flex relative active:text-blue-400 items-center gap-2"
           >
             <RiMessage3Line size={30} />
             <div>Inbox</div>
+            {TotalUnread>0&&<div className="absolute bg-red-600 w-max h-max px-1 text-xs font-bold text-white bottom-4  rounded-full">
+              {TotalUnread}
+            </div>}
           </NavLink>
           <button className="flex active:text-blue-400 items-center gap-2">
             <CgProfile size={30} />
