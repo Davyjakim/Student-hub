@@ -16,7 +16,7 @@ import DefaultChatBody from "./DefaultChatBody";
 import { AuthContext } from "..";
 import UserService from "../ApiService/UserService";
 import EmojiPicker from "emoji-picker-react";
-
+import {  Url } from "../ApiService/ApiClient";
 export const chatContext = createContext();
 
 const contactShape = " sm:h-[448px] lg:h-[598px]  md:h-[548px]";
@@ -48,7 +48,7 @@ function Body() {
 
   const socket = useMemo(
     () =>
-      io.connect("http://localhost:4000", {
+      io.connect(Url, {
         extraHeaders: {
           "x-auth-token": authtoken,
         },
