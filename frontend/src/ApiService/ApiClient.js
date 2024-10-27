@@ -1,7 +1,7 @@
 import axios from "axios";
 import Cookie from "js-cookie";
 
-const Url = "http://localhost:4000";
+const Url = "http://studenthubapi-production.up.railway.app";
 
 const token = Cookie.get("token");
 
