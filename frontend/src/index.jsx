@@ -73,6 +73,7 @@ const AppWithRouter = () => {
   }, [authtoken]);
   useEffect(() => {
     const token = Cookie.get("token");
+    console.log(token)
     if (token !== authtoken) {
       setAuthToken(token);
     }
