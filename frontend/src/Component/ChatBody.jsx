@@ -10,8 +10,6 @@ function ChatBody() {
   const { MessageList, formatDate, ChatBodyShape, setCurrentMessage } =
     useContext(chatContext);
 
-    
-
   return (
     <div className={`bg-slate-400 relative flex flex-col-reverse ${ChatBodyShape}  overflow-y-scroll `}>
       <div className="flex flex-col w-full">

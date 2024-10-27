@@ -49,7 +49,17 @@ router.get("/getme", auth, (req, res) => {
   const user = req.user;
   res.status(200).send(user);
 });
-
+// get users except me 
+router.get("/getUsers", auth, async (req, res) => {
+  const current_user = await User.findById(req.user._id);
+  const friendIds = current_user.friends.map(friend => friend.id)
+  try {
+    const users = await User.find({ _id: { $ne: current_user._id, $nin: friendIds } }).select("-password -friends");
+    res.status(200).send(users);
+  } catch (error) {
+    res.status(500).send({ error: "Error fetching users" });
+  }
+});
 router.put("/addFriend/:fname", auth, async (req, res) => {
   try {
     const Fname = req.params.fname;
@@ -100,12 +110,13 @@ router.get("/getFriends", auth, async (req, res) => {
     // Use `map` to create an array of promises
     const promises = friends.map(async (fr) => {
       const messages = await Messages.findOne({ chatRoom: fr.ChatRoom });
-      return { friend: fr, chatList: messages.messagelist };
+      const unreadMessage= messages.messagelist.filter(Urm=> Urm.isRead===false)
+      return { friend: fr, chatList: messages.messagelist, unreadMessages:unreadMessage };
     });
     
     // Wait for all promises to resolve
     const resolvedResults = await Promise.all(promises);
-    
+  
     // Send the resolved results in the response
     res.status(200).send(resolvedResults);
   } catch (error) {

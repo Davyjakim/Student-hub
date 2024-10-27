@@ -16,6 +16,7 @@ const MessageSchema = new mongoose.Schema({
       content: { type: String, required: true, minlength: 1 },
       isAudio:{type:Boolean , required:true},
       duration:{type:Number},
+      isRead:{type:Boolean},
       timestamp: {
         type: Date,
         default: Date.now,

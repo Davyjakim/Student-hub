@@ -101,7 +101,7 @@ function SignInPage() {
       auth
         .Login(state.emailOrName, state.password)
         .then(() => {
-          window.location.href = "http://localhost:3000/";
+          window.location.href = window.location.origin;
         })
         .catch(() => {
           dispatch({
