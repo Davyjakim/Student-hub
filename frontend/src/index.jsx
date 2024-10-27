@@ -71,6 +71,7 @@ const AppWithRouter = () => {
 
     fetchUser(); // Call the async function
   }, [authtoken]);
+  console.log(authtoken)
   useEffect(() => {
     const token = Cookie.get("token");
     console.log(token)
