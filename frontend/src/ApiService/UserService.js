@@ -1,8 +1,9 @@
 import axios from "axios";
+import Cookie from "js-cookie";
 const { serverurl, Url } = require("./ApiClient");
 class UserService {
-  Login(emailorName, password) {
-    return axios.post(
+  async Login(emailorName, password) {
+     const res = await axios.post(
       `${Url}/auth/login`,
       {
         emailorName: emailorName,
@@ -10,6 +11,12 @@ class UserService {
       },
       { withCredentials: true }
     );
+    Cookie.set("token", res.data, {
+      expires: 1 / 3, // 8 hours 
+      secure: true,
+      sameSite: "Strict",
+    });
+    return res
   }
   SignUp(name, email, password) {
     return axios.post(`${Url}/users/signup`, {

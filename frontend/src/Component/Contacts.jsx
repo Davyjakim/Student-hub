@@ -47,7 +47,6 @@ function Contacts() {
     setTotalUnread(totalUnreadCount);
   }, [friends, userdetails._id]);
 
-  console.log(TotalUnread);
 
   return (
     <div
