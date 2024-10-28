@@ -20,7 +20,6 @@ export const AuthContext = createContext();
 
 const ProtectedLayout = () => {
   const { authtoken } = React.useContext(AuthContext);
-  console.log("Current auth token:", authtoken);
   if (!authtoken) {
     // Redirect to the login page if the user is not authenticated
     return <Navigate to="/login" replace />;
@@ -78,7 +77,7 @@ const AppWithRouter = () => {
     if (token !== authtoken) {
       setAuthToken(token);
     }
-  }, [authtoken, Cookie.get("token")]);
+  }, [Cookie.get("token")]);
 
   const logout = () => {
     Cookie.remove("token");
