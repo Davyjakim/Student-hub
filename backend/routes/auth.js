@@ -7,9 +7,12 @@ const jwt = require("jsonwebtoken");
 
 router.post("/login", async (req, res) => {
   const { error } = validate(req.body);
+
+  // console.log(req.cookies.token)
   if (error) {
     res.status(400).send(error.message);
     return;
+
   }
   let user = await User.findOne({
     $or: [{ email: req.body.emailorName }, { name: req.body.emailorName }],
@@ -29,10 +32,15 @@ router.post("/login", async (req, res) => {
   }
 
   const token = user.generateAuthToken();
-  res.cookie("token", token, { maxAge: 28800000, httpOnly: false });
+  res.cookie("token", token, {
+    maxAge: 28800000,           // 8 hours
+    httpOnly: true, 
+    sameSite: "none" ,
+    path: "/"          
+  });
   res.send('sign up sucessfull');
 
-  console.log(token)
+
 });
 
 function validate(user) {
