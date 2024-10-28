@@ -32,6 +32,7 @@ class UserService {
     try {
       const res = await serverurl.get("/users/getme");
       user = res.data;
+      console.log(user)
     } catch (err) {
       errors = err;
     }
