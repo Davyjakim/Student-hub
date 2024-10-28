@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const { User } = require("../models/User");
 const express = require("express");
 const router = express.Router();
@@ -21,6 +21,7 @@ router.post("/login", async (req, res) => {
   //     email: req.body.email,
   //     password: req.body.password,
   //   });
+  
 
   const isvalidpass = await bcrypt.compare(req.body.password, user.password);
   if (!isvalidpass) {
@@ -29,7 +30,9 @@ router.post("/login", async (req, res) => {
 
   const token = user.generateAuthToken();
   res.cookie("token", token, { maxAge: 28800000, httpOnly: false });
-  res.send("login succefull");
+  res.send('sign up sucessfull');
+
+  console.log(token)
 });
 
 function validate(user) {

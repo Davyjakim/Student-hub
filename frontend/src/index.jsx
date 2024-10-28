@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import reportWebVitals from "./reportWebVitals";
+
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import Body from "./Component/Body.jsx";
 import SignInPage from "./Component/SignInPage.jsx";
@@ -71,9 +71,10 @@ const AppWithRouter = () => {
 
     fetchUser(); // Call the async function
   }, [authtoken]);
+
   useEffect(() => {
     const token = Cookie.get("token");
-    console.log(token)
+    
     if (token !== authtoken) {
       setAuthToken(token);
     }
