@@ -21,7 +21,7 @@ class UserService {
   async getUser() {
     let user = {};
     let errors = "";
-
+   
     try {
       const res = await serverurl.get("/users/getme");
       user = res.data;
