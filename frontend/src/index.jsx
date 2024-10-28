@@ -54,11 +54,11 @@ const AppWithRouter = () => {
   const [userdetails, setUser] = useState({});
   const [friends, setFriends] = useState([]);
   const [authtoken, setAuthToken] = useState(Cookie.get("token"));
-  useLayoutEffect(() => {
+  useEffect(() => {
     const fetchUser = async () => {
       try {
         const { user, errors } = await UserService.getUser();
-        //remove code if there before pushing changes
+       
         const { friends, freindsfetchError } = await UserService.getfriends();
         setFriends(friends);
         setUser(user);
@@ -77,13 +77,13 @@ const AppWithRouter = () => {
     if (token !== authtoken) {
       setAuthToken(token);
     }
-  }, [Cookie.get("token")]);
+  }, [authtoken]);
 
   const logout = () => {
     Cookie.remove("token");
+    
     setAuthToken(null);
     setUser({});
-    window.location.href = `${window.location.origin}/login`;
   };
   
 
