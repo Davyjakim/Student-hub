@@ -9,7 +9,7 @@ import React, {
 import ReactDOM from "react-dom/client";
 import "./index.css";
 
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate,Outlet, RouterProvider } from "react-router-dom";
 import Body from "./Component/Body.jsx";
 import SignInPage from "./Component/SignInPage.jsx";
 import UserService from "./ApiService/UserService.js";
@@ -22,8 +22,7 @@ const ProtectedLayout = () => {
   const { authtoken } = React.useContext(AuthContext);
   if (!authtoken) {
     // Redirect to the login page if the user is not authenticated
-    window.location.href = `${window.location.origin}/login`;
-    return <div>...loading</div>;
+    return <Navigate to="/login" replace />;
   }
   return <Outlet />;
 };
@@ -74,17 +73,19 @@ const AppWithRouter = () => {
 
   useEffect(() => {
     const token = Cookie.get("token");
-    
+  
     if (token !== authtoken) {
       setAuthToken(token);
     }
-  }, [authtoken]);
+  }, [Cookie.get("token")]);
 
   const logout = () => {
-    window.location.href = `${window.location.origin}/login`;
     Cookie.remove("token");
+    setAuthToken(null);
     setUser({});
+    window.location.href = `${window.location.origin}/login`;
   };
+  
 
   const updateUser = (updatedUser) => {
     setUser(updatedUser);
