@@ -12,7 +12,6 @@ router.post("/login", async (req, res) => {
   if (error) {
     res.status(400).send(error.message);
     return;
-
   }
   let user = await User.findOne({
     $or: [{ email: req.body.emailorName }, { name: req.body.emailorName }],
@@ -24,7 +23,6 @@ router.post("/login", async (req, res) => {
   //     email: req.body.email,
   //     password: req.body.password,
   //   });
-  
 
   const isvalidpass = await bcrypt.compare(req.body.password, user.password);
   if (!isvalidpass) {
@@ -32,15 +30,8 @@ router.post("/login", async (req, res) => {
   }
 
   const token = user.generateAuthToken();
-  res.cookie("token", token, {
-    maxAge: 28800000,           // 8 hours
-    httpOnly: true, 
-    sameSite: "none" ,
-    path: "/"          
-  });
-  res.send('sign up sucessfull');
 
-
+  res.send(token);
 });
 
 function validate(user) {
